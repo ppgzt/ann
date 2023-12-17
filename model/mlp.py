@@ -6,10 +6,14 @@ class MLP:
     def __init__(self, layers=[]):
         self.layers = layers
 
-    def fit(self, X_train, D_train, learn_rate=0.1, verbose=False):
+    def fit(self, X_train, D_train, learn_rate=0.1, precision=0.001, verbose=False):
         epoch = -1
+        Eqm = None
+
         while True:
             epoch += 1
+            Eq = 0
+
             for i in range(0, X_train.shape[0]):
                 X = X_train[i]
 
@@ -29,14 +33,21 @@ class MLP:
                     for j in range(1, layer.W.shape[0]):
                         Sk.append((layer.S*layer.W[:, j]).sum())
 
-                    last_layer = False
+                    if last_layer:
+                        Eq += (layer.E ** 2).sum()
+                        last_layer = False
 
-            if verbose:
-                print('E: ', epoch, 'X: ', X, 'W: ')
-                for k in range(len(self.layers)):
-                    print(' Layer ', k, ':\n', self.layers[k].W)
+            Eqm_epoch = Eq / X_train.shape[0]
+            if Eqm != None and abs(Eqm_epoch - Eqm) < precision:
+                Eqm = Eqm_epoch
+                break
+            else:
+                Eqm = Eqm_epoch
 
-            break
+        if verbose:
+            print('Epochs: ', epoch, 'Eqm: ', Eqm, 'X: ', X, 'W: ')
+            for k in range(len(self.layers)):
+                print(' Layer ', k, ':\n', self.layers[k].W)
         return {'epochs': epoch+1}
 
     def predict(self, X):
@@ -49,6 +60,8 @@ class Layer:
     def __init__(self, n_j=1, n_i=1, g=None, gd=None):
         self.W = np.zeros((n_j, n_i))
         self.S = None
+        self.E = None
+
         self.g = g
         self.gd = gd
 
@@ -59,8 +72,8 @@ class Layer:
         Yj = self.g(Ij)
 
         if last_layer:
-            Ej = Dj - Yj
-            self.S = Ej * self.gd(Ij)
+            self.E = Dj - Yj
+            self.S = self.E * self.gd(Ij)
         else:
             self.S = Sk * self.gd(Ij)
 
