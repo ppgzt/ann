@@ -1,7 +1,27 @@
-from model.perceptron import Perceptron
 import numpy as np
 
+from model.perceptron import Perceptron
+from model.mlp import *
+
+
 def main():
+    def gd(x): return -2*(1/(1+np.exp(-x)))*np.exp(-x)
+    def g(x): return 1/(1+np.exp(-x))
+
+    mlp = MLP(layers=[
+        Layer(n_j=3, n_i=4, g=g, gd=gd),
+        Layer(n_j=2, n_i=4, g=g, gd=gd)])
+    
+    mlp.fit(X_train=np.array([
+        [0.2, 0.9, 0.4],
+        [0.1, 0.5, 0.3]
+    ]), D_train=np.array([
+        [0.7, 0.3],
+        [0.8, 0.2]
+    ]), verbose=True)
+
+
+def _main():
     rna = Perceptron(g=lambda x: 1 if x >= 0 else -1)
     train_set = np.array([
         [-0.6508,	0.1097,	4.0009,	-1.0000],
