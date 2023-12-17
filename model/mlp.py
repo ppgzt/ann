@@ -58,7 +58,7 @@ class MLP:
 class Layer:
 
     def __init__(self, n_j=1, n_i=1, g=None, gd=None):
-        self.W = np.zeros((n_j, n_i))
+        self.W = np.random.random_sample((n_j, n_i))
         self.S = None
         self.E = None
 
