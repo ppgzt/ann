@@ -27,7 +27,7 @@ class MLP:
 
                 for layer in reversed(self.layers):
                     layer.fit(Yi=Yi_stack.pop(),
-                              last_layer=last_layer, Dj=D_train[i], Sk=Sk)
+                              last_layer=last_layer, Dj=D_train[i], Sk=Sk, learn_rate=learn_rate)
 
                     Sk = []
                     for j in range(1, layer.W.shape[1]):
@@ -57,8 +57,11 @@ class MLP:
 
 class Layer:
 
-    def __init__(self, n_j=1, n_i=1, g=None, gd=None):
-        self.W = np.random.random_sample((n_j, n_i+1))
+    def __init__(self, n_j=1, n_i=1, W=None, g=None, gd=None):
+        if W is None:
+            self.W = np.random.random_sample((n_j, n_i+1))
+        else:
+            self.W = W
         self.S = None
         self.E = None
 

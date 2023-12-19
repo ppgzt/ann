@@ -5,7 +5,6 @@ from model.perceptron import Perceptron
 from model.mlp import *
 from model.math import Math
 
-
 def main():
     g = Math.get('tanh')['g']
     d = Math.get('tanh')['d']
@@ -27,6 +26,25 @@ def main():
 
     mlp.fit(X_train=dataset[:, :-3], D_train=dataset[:, -3:],
             precision=0.0001, verbose=True)
+
+# Rodar com somente 1 época!!!
+def _main():
+    g = Math.get('logi')['g']
+    d = Math.get('logi')['d']
+
+    mlp = MLP(layers=[
+        Layer(n_j=3, n_i=2, g=g, gd=d, W=np.array([
+            [0.2, -0.1, 0.3],
+            [-0.5, -0.8, 0.4],
+            [-0.1, 0.1, -0.6]
+        ])),
+        Layer(n_j=2, n_i=3, g=lambda x: x, gd= lambda x: 1, W=np.array([
+            [0.1, 0.5, -0.3, 0.1],
+            [0.3, 0.2, 0.6, -0.9],
+        ]))])
+
+    mlp.fit(X_train=np.array([[2, 1]]), D_train=np.array([[
+            1, 1]]), precision=0.0001, verbose=True)
 
 
 def _main():
