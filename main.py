@@ -1,24 +1,32 @@
 import numpy as np
+import re
 
 from model.perceptron import Perceptron
 from model.mlp import *
+from model.math import Math
 
 
 def main():
-    def gd(x): return -2*(1/(1+np.exp(-x)))*np.exp(-x)
-    def g(x): return 1/(1+np.exp(-x))
+    g = Math.get('tanh')['g']
+    d = Math.get('tanh')['d']
+
+    dataset = []
+    with open('data/5_9/5_9_pmc_proj_pratico_2.csv') as f:
+        lines = f.readlines()
+        first = True
+        for line in lines:
+            if (not first):
+                sentence = re.sub(r"\s+", "", line, flags=re.UNICODE)
+                dataset.append([float(i) for i in sentence.split(';')])
+            first = False
+    dataset = np.array(dataset)
 
     mlp = MLP(layers=[
-        Layer(n_j=3, n_i=4, g=g, gd=gd),
-        Layer(n_j=2, n_i=4, g=g, gd=gd)])
+        Layer(n_j=15, n_i=4, g=g, gd=d),
+        Layer(n_j=3, n_i=15, g=g, gd=d)])
 
-    mlp.fit(X_train=np.array([
-        [0.2, 0.9, 0.4],
-        [0.1, 0.5, 0.3]
-    ]), D_train=np.array([
-        [0.7, 0.3],
-        [0.8, 0.2]
-    ]), precision=0.0001, verbose=True)
+    mlp.fit(X_train=dataset[:, :-3], D_train=dataset[:, -3:],
+            precision=0.0001, verbose=True)
 
 
 def _main():
@@ -56,8 +64,26 @@ def _main():
         [0.2012,	0.2611,	5.4631,	1.0000],
     ])
 
-    result = rna.fit(train_set, learn_rate=0.5)
+    result = rna.fit(train_set, learn_rate=0.1)
+
+    train_set = np.array([
+        [-0.3665,	0.0620,	5.9891],
+        [-0.7842,	1.1267,	5.5912],
+        [0.3012,	0.5611,	5.8234],
+        [0.7757,	1.0648,	8.0677],
+        [0.1570,	0.8028,	6.3040],
+        [-0.7014,	1.0316,	3.6005],
+        [0.3748,	0.1536,	6.1537],
+        [-0.6920,	0.9404,	4.4058],
+        [-1.3970,	0.7141,	4.9263],
+        [-1.8842,	-0.2805,	1.2548]
+    ])
     print(result)
+
+    Y = {}
+    for i in range(train_set.shape[0]):
+        Y[i] = rna.predict(train_set[i, :])
+    print(Y)
 
 
 if __name__ == '__main__':
