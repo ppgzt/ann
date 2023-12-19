@@ -30,7 +30,7 @@ class MLP:
                               last_layer=last_layer, Dj=D_train[i], Sk=Sk)
 
                     Sk = []
-                    for j in range(1, layer.W.shape[0]):
+                    for j in range(1, layer.W.shape[1]):
                         Sk.append((layer.S*layer.W[:, j]).sum())
 
                     if last_layer:
@@ -58,7 +58,7 @@ class MLP:
 class Layer:
 
     def __init__(self, n_j=1, n_i=1, g=None, gd=None):
-        self.W = np.random.random_sample((n_j, n_i))
+        self.W = np.random.random_sample((n_j, n_i+1))
         self.S = None
         self.E = None
 
